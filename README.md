@@ -1,10 +1,5 @@
 # stm32-distributed-motor-control
 Distributed embedded motor control system based on STM32, CAN and Raspberry Pi.
-# STM32 Distributed Motor Control
-
-## Overview
-
-This repository documents the development of a distributed embedded control system.
 
 ## Final Architecture
 

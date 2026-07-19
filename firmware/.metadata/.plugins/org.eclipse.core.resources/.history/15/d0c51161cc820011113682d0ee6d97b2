@@ -1,0 +1,15 @@
+/*
+ * motor_control.h
+ *
+ *  Created on: 18 lip 2026
+ *      Author: patry
+ */
+
+#ifndef INC_MOTOR_CONTROL_H_
+#define INC_MOTOR_CONTROL_H_
+#include <stdint.h>
+
+void Motor_SetSpeed(uint8_t speed);
+void Motor_Stop(void);
+
+#endif /* INC_MOTOR_CONTROL_H_ */
