@@ -14,8 +14,8 @@ Distributed embedded motor control system based on STM32, CAN and Raspberry Pi.
 
 ## Development Roadmap
 
-- [ ] Motor PWM
-- [ ] UART Control
+- [x] Motor PWM
+- [x] UART Control
 - [ ] Encoder
 - [ ] Current Measurement
 - [ ] PID

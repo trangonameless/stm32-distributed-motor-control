@@ -1,18 +1,19 @@
 #settings
 .settings/
+.metadata/
+**/.metadata/
 
 # Extra build artifacts
 *.cyclo
 *.list
 
-#metadata
-.metadata/
-
 #Debug
 Debug/
 debug/
 Release/
-release
+release/
+**/Debug/
+**/Release/
 
 # Prerequisites
 *.d
