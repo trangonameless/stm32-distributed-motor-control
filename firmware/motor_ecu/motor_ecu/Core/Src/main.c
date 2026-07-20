@@ -18,6 +18,7 @@
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
+#include "adc.h"
 #include "tim.h"
 #include "usart.h"
 #include "gpio.h"
@@ -26,8 +27,10 @@
 /* USER CODE BEGIN Includes */
 #include <string.h>
 #include "motor_control.h"
+#include "current_sense.h"
 #include <stdio.h>
 #include <stdlib.h>
+
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -186,25 +189,43 @@ int main(void)
   MX_GPIO_Init();
   MX_USART2_UART_Init();
   MX_TIM2_Init();
+  MX_ADC1_Init();
   /* USER CODE BEGIN 2 */
 
   HAL_TIM_PWM_Start(&htim2,TIM_CHANNEL_1);
-
+  CurrentSense_initialization();
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1)
   {
+      uint8_t value;
 
-	  uint8_t value;
-	  	  if (HAL_UART_Receive(&huart2, &value, 1, 0) == HAL_OK)
-	  		  line_append(value);
+      // UART command reception
+      if (HAL_UART_Receive(&huart2, &value, 1, 0) == HAL_OK)
+      {
+          line_append(value);
+      }
+
+
+     //  Current sense measurement every 250ms
+      float cs;
+      static uint32_t adc_timer = 0;
+
+      if (HAL_GetTick() - adc_timer >= 250)
+      {
+          adc_timer = HAL_GetTick();
+          cs = CurrentSense_ReadCurrent();
+          printf("Current = %.3f A\r\n", cs);
+
+      }
+  }
 
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-  }
+
   /* USER CODE END 3 */
 }
 
