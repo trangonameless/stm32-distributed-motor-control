@@ -28,6 +28,8 @@
 #include <string.h>
 #include "motor_control.h"
 #include "current_sense.h"
+#include "speed_sensor.h"
+#include "telemetry.h"
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -190,10 +192,13 @@ int main(void)
   MX_USART2_UART_Init();
   MX_TIM2_Init();
   MX_ADC1_Init();
+  MX_TIM3_Init();
+  MX_USART1_UART_Init();
   /* USER CODE BEGIN 2 */
 
   HAL_TIM_PWM_Start(&htim2,TIM_CHANNEL_1);
-  CurrentSense_initialization();
+  CurrentSense_Init();
+  SpeedSensor_Init();
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -208,20 +213,29 @@ int main(void)
           line_append(value);
       }
 
+      SpeedSensor_Update();
 
-     //  Current sense measurement every 250ms
-      float cs;
-      static uint32_t adc_timer = 0;
+      static uint32_t timer = 0;
 
-      if (HAL_GetTick() - adc_timer >= 250)
+      if(HAL_GetTick() - timer >= 250)
       {
-          adc_timer = HAL_GetTick();
-          cs = CurrentSense_ReadCurrent();
-          printf("Current = %.3f A\r\n", cs);
+          timer = HAL_GetTick();
 
+          float current = CurrentSense_ReadCurrent();
+          float rpm = SpeedSensor_GetRPM();
+
+          printf("Current = %.3f A\r\n",
+                  current);
+
+          printf("RPM = %.1f\r\n",
+                  rpm);
+
+          Telemetry_SendData(current, rpm);
       }
-  }
 
+
+
+  }
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */

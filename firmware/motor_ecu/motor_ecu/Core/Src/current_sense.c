@@ -4,7 +4,7 @@
  *  Created on: 19 lip 2026
  *      Author: patry
  */
-
+#include "current_sense.h"
 #include "main.h"
 #include "adc.h"
 #include <stdio.h>
@@ -13,7 +13,7 @@
 #define AIPROPI_uA_PER_A    1000.0f  // DRV8876 datasheet
 
 
-void CurrentSense_initialization(void)
+void CurrentSense_Init(void)
 {
 	HAL_ADCEx_Calibration_Start(&hadc1, ADC_SINGLE_ENDED);
 	HAL_ADC_Start(&hadc1);

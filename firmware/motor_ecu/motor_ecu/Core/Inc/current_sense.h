@@ -11,7 +11,7 @@
 #ifndef CURRENT_SENSE_H
 #define CURRENT_SENSE_H
 
-void CurrentSense_initialization(void);
+void CurrentSense_Init(void);
 float CurrentSense_ReadCurrent(void);
 
 #endif
