@@ -16,12 +16,12 @@ Distributed embedded motor control system based on STM32, CAN and Raspberry Pi.
 
 - [x] Motor PWM
 - [x] UART Control
-- [ ] Encoder
-- [ ] Current Measurement
+- [x] Encoder
+- [x] Current Measurement
 - [ ] PID
 - [ ] Diagnostics
 - [ ] Two STM32
 - [ ] CAN Protocol
-- [ ] Raspberry Pi
-- [ ] MQTT
-- [ ] Grafana
+- [x] Raspberry Pi
+- [x] MQTT
+- [x] Grafana
