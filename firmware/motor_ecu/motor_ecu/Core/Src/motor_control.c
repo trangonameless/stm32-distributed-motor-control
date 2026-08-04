@@ -7,6 +7,10 @@
 #include "motor_control.h"
 #include "tim.h"
 
+static uint8_t pwm_duty = 0;
+static uint16_t set_speed = 0;
+float target_rpm = 0.0f;
+uint8_t motor_enabled = 0;
 
 void Motor_SetDirection(MotorDirection_t direction)
 {
@@ -28,28 +32,39 @@ void Motor_SetDirection(MotorDirection_t direction)
     }
 }
 
-void Motor_SetSpeed(uint8_t speed)
+
+void Motor_SetSpeed(uint8_t duty)
 {
-    if(speed > 100)
+    if (duty > 100)
     {
-        speed = 100;
+        duty = 100;
     }
 
+    // Store current PWM duty cycle (used by telemetry)
+    pwm_duty = duty;
 
-    uint32_t pulse;
-
-    pulse = (speed * (__HAL_TIM_GET_AUTORELOAD(&htim2) + 1)) / 100;
-
+    uint32_t pulse =
+        (pwm_duty * (__HAL_TIM_GET_AUTORELOAD(&htim2) + 1)) / 100;
 
     __HAL_TIM_SET_COMPARE(&htim2,
                           TIM_CHANNEL_1,
                           pulse);
 }
 
+uint8_t Motor_GetPWM(void)
+{
+    return pwm_duty;
+}
+
+uint16_t Motor_GetSpeed(void)
+{
+    return set_speed;
+}
 
 
 void Motor_Stop(void)
 {
+	pwm_duty = 0;
     __HAL_TIM_SET_COMPARE(&htim2,
                           TIM_CHANNEL_1,
                           0);

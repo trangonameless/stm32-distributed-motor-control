@@ -10,6 +10,8 @@
 #include <stdint.h>
 #include <stdbool.h>
 
+extern float target_rpm;
+extern uint8_t motor_enabled;
 typedef enum
 {
     MOTOR_LEFT = 0,
@@ -20,5 +22,6 @@ typedef enum
 void Motor_SetSpeed(uint8_t speed);
 void Motor_SetDirection(MotorDirection_t direction);
 void Motor_Stop(void);
-
+uint8_t Motor_GetPWM(void);
+uint16_t Motor_GetSpeed(void);
 #endif /* INC_MOTOR_CONTROL_H_ */

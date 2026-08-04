@@ -1,3 +1,5 @@
-../Core/Src/motor_control.c:11:6:Motor_SetDirection	2
-../Core/Src/motor_control.c:31:6:Motor_SetSpeed	2
-../Core/Src/motor_control.c:51:6:Motor_Stop	1
+../Core/Src/motor_control.c:15:6:Motor_SetDirection	2
+../Core/Src/motor_control.c:36:6:Motor_SetSpeed	2
+../Core/Src/motor_control.c:54:9:Motor_GetPWM	1
+../Core/Src/motor_control.c:59:10:Motor_GetSpeed	1
+../Core/Src/motor_control.c:65:6:Motor_Stop	1

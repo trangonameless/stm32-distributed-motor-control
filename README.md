@@ -18,7 +18,7 @@ Distributed embedded motor control system based on STM32, CAN and Raspberry Pi.
 - [x] UART Control
 - [x] Encoder
 - [x] Current Measurement
-- [ ] PID
+- [x] PID
 - [ ] Diagnostics
 - [ ] Two STM32
 - [ ] CAN Protocol

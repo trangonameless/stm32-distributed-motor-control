@@ -30,9 +30,11 @@
 #include "current_sense.h"
 #include "speed_sensor.h"
 #include "telemetry.h"
+#include "pid_controller.h"
 #include <stdio.h>
 #include <stdlib.h>
-
+#include <math.h>
+#include <uart_interface.h>
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -51,9 +53,9 @@
 /* USER CODE END PM */
 
 /* Private variables ---------------------------------------------------------*/
-
 /* USER CODE BEGIN PV */
-
+//static float target_rpm = 0.0f;
+//static uint8_t motor_enabled = 0;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -74,90 +76,66 @@ int __io_putchar(int ch)
     return 1;
 }
 
-void Process_Command(char *command)
-{
-    char direction;
-    uint8_t speed;
 
 
-    direction = command[0];
 
-    speed = atoi(&command[1]);
+//void Process_Command(char *command)
+//{
+//    char direction;
+//    uint8_t speed;
+//
+//
+//    direction = command[0];
+//
+//    speed = atoi(&command[1]);
+//
+//
+//    if(speed > 100)
+//    {
+//        speed = 100;
+//    }
+//
+//
+//    switch(direction)
+//    {
+//        case 'L':
+//
+//            Motor_SetDirection(MOTOR_LEFT);
+//            Motor_SetSpeed(speed);
+//
+//            printf("LEFT %d%%\r\n", speed);
+//
+//            break;
+//
+//
+//        case 'P':
+//
+//            Motor_SetDirection(MOTOR_RIGHT);
+//            Motor_SetSpeed(speed);
+//
+//            printf("RIGHT %d%%\r\n", speed);
+//
+//            break;
+//
+//
+//        case 'S':
+//
+//            Motor_Stop();
+//
+//            printf("STOP\r\n");
+//
+//            break;
+//
+//
+//        default:
+//
+//            printf("Unknown command\r\n");
+//
+//            break;
+//    }
+//}
 
 
-    if(speed > 100)
-    {
-        speed = 100;
-    }
-
-
-    switch(direction)
-    {
-        case 'L':
-
-            Motor_SetDirection(MOTOR_LEFT);
-            Motor_SetSpeed(speed);
-
-            printf("LEFT %d%%\r\n", speed);
-
-            break;
-
-
-        case 'P':
-
-            Motor_SetDirection(MOTOR_RIGHT);
-            Motor_SetSpeed(speed);
-
-            printf("RIGHT %d%%\r\n", speed);
-
-            break;
-
-
-        case 'S':
-
-            Motor_Stop();
-
-            printf("STOP\r\n");
-
-            break;
-
-
-        default:
-
-            printf("Unknown command\r\n");
-
-            break;
-    }
-}
-
-#define LINE_MAX_LENGTH	80
-static char line_buffer[LINE_MAX_LENGTH + 1];
-static uint32_t line_length;
-void line_append(uint8_t value)
-{
-	if (value == '\r' || value == '\n')
-	{
-	    if(line_length > 0)
-	    {
-	        line_buffer[line_length] = '\0';
-
-	        Process_Command(line_buffer);
-
-	        line_length = 0;
-	    }
-	}
-	else
-	{
-	    if(line_length < LINE_MAX_LENGTH)
-	    {
-	        line_buffer[line_length++] = value;
-	    }
-	    else
-	    {
-	        line_length = 0;
-	    }
-	}
-}
 /* USER CODE END 0 */
 
 /**
@@ -199,15 +177,20 @@ int main(void)
   HAL_TIM_PWM_Start(&htim2,TIM_CHANNEL_1);
   CurrentSense_Init();
   SpeedSensor_Init();
+  PID_Init(1.1f, 0.4f, 0.0f);
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-      uint8_t value;
+
+      static uint32_t timer = 0;
+      static uint32_t pid_timer = 0;
 
       // UART command reception
+      uint8_t value;
+
       if (HAL_UART_Receive(&huart2, &value, 1, 0) == HAL_OK)
       {
           line_append(value);
@@ -215,7 +198,25 @@ int main(void)
 
       SpeedSensor_Update();
 
-      static uint32_t timer = 0;
+
+      if(HAL_GetTick()-pid_timer >=10)
+      {
+          pid_timer=HAL_GetTick();
+
+          if (motor_enabled)
+          {
+          float rpm = fabsf(SpeedSensor_GetRPM());
+
+
+          float pwm =
+              PID_Update(
+                   target_rpm,
+                   rpm
+              );
+
+          Motor_SetSpeed((uint8_t)pwm);
+          }
+      }
 
       if(HAL_GetTick() - timer >= 250)
       {
@@ -223,14 +224,21 @@ int main(void)
 
           float current = CurrentSense_ReadCurrent();
           float rpm = SpeedSensor_GetRPM();
+          uint16_t set_speed = target_rpm;
+          uint8_t pwm = Motor_GetPWM();
 
           printf("Current = %.3f A\r\n",
                   current);
 
           printf("RPM = %.1f\r\n",
                   rpm);
+          printf("PWM = %u\r\n",
+                            pwm);
+          printf("Set Speed = %u\r\n",
+                            set_speed);
 
-          Telemetry_SendData(current, rpm);
+
+          Telemetry_SendData(current, rpm, pwm, set_speed);
       }
 
 
