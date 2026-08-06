@@ -77,65 +77,6 @@ int __io_putchar(int ch)
 }
 
 
-
-
-//void Process_Command(char *command)
-//{
-//    char direction;
-//    uint8_t speed;
-//
-//
-//    direction = command[0];
-//
-//    speed = atoi(&command[1]);
-//
-//
-//    if(speed > 100)
-//    {
-//        speed = 100;
-//    }
-//
-//
-//    switch(direction)
-//    {
-//        case 'L':
-//
-//            Motor_SetDirection(MOTOR_LEFT);
-//            Motor_SetSpeed(speed);
-//
-//            printf("LEFT %d%%\r\n", speed);
-//
-//            break;
-//
-//
-//        case 'P':
-//
-//            Motor_SetDirection(MOTOR_RIGHT);
-//            Motor_SetSpeed(speed);
-//
-//            printf("RIGHT %d%%\r\n", speed);
-//
-//            break;
-//
-//
-//        case 'S':
-//
-//            Motor_Stop();
-//
-//            printf("STOP\r\n");
-//
-//            break;
-//
-//
-//        default:
-//
-//            printf("Unknown command\r\n");
-//
-//            break;
-//    }
-//}
-
-
 /* USER CODE END 0 */
 
 /**
@@ -191,7 +132,7 @@ int main(void)
       // UART command reception
       uint8_t value;
 
-      if (HAL_UART_Receive(&huart2, &value, 1, 0) == HAL_OK)
+      if (HAL_UART_Receive(&huart1, &value, 1, 0) == HAL_OK)
       {
           line_append(value);
       }
@@ -223,7 +164,7 @@ int main(void)
           timer = HAL_GetTick();
 
           float current = CurrentSense_ReadCurrent();
-          float rpm = SpeedSensor_GetRPM();
+          float rpm = fabsf(SpeedSensor_GetRPM());
           uint16_t set_speed = target_rpm;
           uint8_t pwm = Motor_GetPWM();
 

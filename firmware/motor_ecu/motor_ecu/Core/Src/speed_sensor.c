@@ -7,8 +7,7 @@
 
 #include "speed_sensor.h"
 #include "tim.h"
-//#include <stdio.h>
-//#include <stdlib.h>
+
 #define ENCODER_COUNTS_PER_REV             924.0f //462.0f       // Waveshare 22346 datasheet
 #define UPDATE_PERIOD_MS       10.0f
 
@@ -47,10 +46,6 @@ void SpeedSensor_Update(void)
         motor_rpm =
             ((float)delta / ENCODER_COUNTS_PER_REV)
             * (60000.0f / UPDATE_PERIOD_MS);
-//        printf("Counter = %d  Delta = %d  RPM = %.1f\r\n",
-//               encoder_position,
-//               delta,
-//               motor_rpm);
     }
 }
 
