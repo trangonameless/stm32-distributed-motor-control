@@ -19,6 +19,7 @@
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 #include "adc.h"
+#include "can.h"
 #include "tim.h"
 #include "usart.h"
 #include "gpio.h"
@@ -35,6 +36,7 @@
 #include <stdlib.h>
 #include <math.h>
 #include <uart_interface.h>
+#include "diagnostics.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -53,6 +55,7 @@
 /* USER CODE END PM */
 
 /* Private variables ---------------------------------------------------------*/
+
 /* USER CODE BEGIN PV */
 //static float target_rpm = 0.0f;
 //static uint8_t motor_enabled = 0;
@@ -66,6 +69,7 @@ void SystemClock_Config(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
+
 int __io_putchar(int ch)
 {
     if (ch == '\n') {
@@ -75,7 +79,6 @@ int __io_putchar(int ch)
     HAL_UART_Transmit(&huart2, (uint8_t*)&ch, 1, HAL_MAX_DELAY);
     return 1;
 }
-
 
 /* USER CODE END 0 */
 
@@ -113,16 +116,20 @@ int main(void)
   MX_ADC1_Init();
   MX_TIM3_Init();
   MX_USART1_UART_Init();
+  MX_CAN1_Init();
   /* USER CODE BEGIN 2 */
-
   HAL_TIM_PWM_Start(&htim2,TIM_CHANNEL_1);
   CurrentSense_Init();
   SpeedSensor_Init();
   PID_Init(1.1f, 0.4f, 0.0f);
+  Diagnostics_Init();
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
+
+
+
   while (1)
   {
 
@@ -130,12 +137,12 @@ int main(void)
       static uint32_t pid_timer = 0;
 
       // UART command reception
-      uint8_t value;
+          uint8_t value;
 
-      if (HAL_UART_Receive(&huart1, &value, 1, 0) == HAL_OK)
-      {
-          line_append(value);
-      }
+          if (HAL_UART_Receive(&huart1, &value, 1, 0) == HAL_OK)
+          {
+              line_append(value);
+          }
 
       SpeedSensor_Update();
 
@@ -144,20 +151,31 @@ int main(void)
       {
           pid_timer=HAL_GetTick();
 
+          float rpm = fabsf(SpeedSensor_GetRPM());
+          float pwm = 0.0f;
+
           if (motor_enabled)
           {
-          float rpm = fabsf(SpeedSensor_GetRPM());
 
-
-          float pwm =
-              PID_Update(
-                   target_rpm,
-                   rpm
-              );
+          pwm = PID_Update(target_rpm, rpm);
 
           Motor_SetSpeed((uint8_t)pwm);
+          Diagnostics_Update(target_rpm, rpm, pwm);
+
           }
+
+
+          uint8_t faults = Diagnostics_GetFaults();
+
+          if (faults != MOTOR_FAULT_NONE)
+
+             {
+                 Motor_Stop();
+                 motor_enabled = false;
+             }
+
       }
+
 
       if(HAL_GetTick() - timer >= 250)
       {
@@ -167,16 +185,14 @@ int main(void)
           float rpm = fabsf(SpeedSensor_GetRPM());
           uint16_t set_speed = target_rpm;
           uint8_t pwm = Motor_GetPWM();
+          uint8_t faults = Diagnostics_GetFaults();
 
-          printf("Current = %.3f A\r\n",
-                  current);
 
-          printf("RPM = %.1f\r\n",
-                  rpm);
-          printf("PWM = %u\r\n",
-                            pwm);
-          printf("Set Speed = %u\r\n",
-                            set_speed);
+          printf("Current = %.3f A\r\n", current);
+          printf("RPM = %.1f\r\n", rpm);
+          printf("PWM = %u\r\n", pwm);
+          printf("Set Speed = %u\r\n", set_speed);
+          printf("Faults = 0x%02X\r\n", faults);
 
 
           Telemetry_SendData(current, rpm, pwm, set_speed);

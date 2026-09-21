@@ -8,6 +8,7 @@
 #include <stdlib.h>
 #include <pid_controller.h>
 #include <stdio.h>
+#include <diagnostics.h>
 
 #define LINE_MAX_LENGTH	80
 static char line_buffer[LINE_MAX_LENGTH + 1];
@@ -52,6 +53,14 @@ void Process_Command(char *command)
             PID_Reset();
 
             printf("STOP\r\n");
+
+
+            break;
+
+        case 'R':
+
+        	Diagnostics_ClearFaults();
+            printf("Alarm RESET\r\n");
 
 
             break;
