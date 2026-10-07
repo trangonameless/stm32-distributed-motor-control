@@ -61,6 +61,8 @@ void Error_Handler(void);
 #define MotorDirection_GPIO_Port GPIOA
 #define LD2_Pin GPIO_PIN_5
 #define LD2_GPIO_Port GPIOA
+#define Drv8876_Fault_Pin GPIO_PIN_8
+#define Drv8876_Fault_GPIO_Port GPIOC
 
 /* USER CODE BEGIN Private defines */
 

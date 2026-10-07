@@ -15,7 +15,7 @@ void SpeedSensor_Init(void);
 void SpeedSensor_Update(void);
 
 
-int32_t SpeedSensor_GetPosition(void);
+uint16_t SpeedSensor_GetPosition(void);
 float SpeedSensor_GetRPM(void);
 uint32_t SpeedSensor_GetNoChangeTime(void);
 

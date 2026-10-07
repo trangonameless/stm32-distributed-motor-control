@@ -18,5 +18,6 @@ void Telemetry_SendData(float current, float rpm, uint8_t pwm, uint16_t set_spee
 		  pwm,
 		  set_speed
 	  );
-	      HAL_UART_Transmit(&huart1, (uint8_t*)msg, len, HAL_MAX_DELAY);
+    printf("TX: %s", msg);
+	HAL_UART_Transmit(&huart1, (uint8_t*)msg, len, HAL_MAX_DELAY);
 }

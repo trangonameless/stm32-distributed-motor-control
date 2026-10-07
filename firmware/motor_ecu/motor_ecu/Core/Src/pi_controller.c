@@ -11,14 +11,14 @@ static float ki = 0;
 static float dt = 0.01;
 static float integral = 0;
 
-void PID_Init(float kp_value, float ki_value)
+void PI_Init(float kp_value, float ki_value)
 {
     kp = kp_value;
     ki = ki_value;
 }
 
 
-float PID_Update(float setpoint, float measurement)
+float PI_Update(float setpoint, float measurement)
 {
 	float error = setpoint - measurement;
 
@@ -43,7 +43,7 @@ float PID_Update(float setpoint, float measurement)
     return output;
 }
 
-void PID_Reset(void)
+void PI_Reset(void)
 {
     integral = 0.0f;
 }
