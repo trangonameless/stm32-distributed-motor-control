@@ -2,7 +2,7 @@
 
 ![Motor control demo](docs/demo.gif)
 
-![Watch the full presentation on YouTube](https://youtu.be/IHiPVReutKA)
+🎥 [Watch the full presentation on YouTube](https://youtu.be/IHiPVReutKA)
 
 # stm32-distributed-motor-control
 Distributed embedded motor control system: STM32L476 Motor ECU in a
