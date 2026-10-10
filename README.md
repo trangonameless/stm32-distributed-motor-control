@@ -1,6 +1,8 @@
 ## Demo
+
 ![Motor control demo](docs/demo.gif)
-[![Full presentation on YouTube](https://img.youtube.com/vi/IHiPVReutKA/hqdefault.jpg)](https://youtu.be/IHiPVReutKA)
+
+![Watch the full presentation on YouTube](https://youtu.be/IHiPVReutKA)
 
 # stm32-distributed-motor-control
 Distributed embedded motor control system: STM32L476 Motor ECU in a
@@ -39,7 +41,6 @@ setpoint) in real time, visualized in Grafana.
 Motor parameters — setpoint, measured speed, current, PWM duty — are
 streamed over UART as JSON and visualized live in Grafana.
 
-> 📄 For the full firmware functionality breakdown (UART commands,
-> encoder details, PI tuning, current sense configuration, diagnostics
-> fault table) see **[`firmware/README.md`](firmware/README.md)**.
+📄 For the full firmware functionality breakdown (UART commands, encoder details, PI tuning, current sense configuration, diagnostics fault table) see [`firmware/README.md`](firmware/README.md).
 
+🔧 For the hardware schematic and board details see [`hardware/README.md`](hardware/README.md).
