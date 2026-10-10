@@ -163,6 +163,7 @@ int main(void)
         // been assembled (terminated by \r or \n) in uart_interface.c.
         if (UART_Command_Get(command))
         {
+            Diagnostics_CommAlive();   // any received line counts as "supervisor alive"
             Process_Command(command);
         }
 
@@ -188,14 +189,18 @@ int main(void)
                 Motor_SetSpeed((uint8_t) pwm);
             }
             // Diagnostics run unconditionally, even when the motor is disabled.
-            // This matters specifically for Driver_Fault() (DRV8876 nFAULT pin):
-            // it's a hardware protection signal (overcurrent/overvoltage) that
-            // can assert regardless of whether we're actively commanding the
-            // motor, so it must not be gated behind motor_enabled. The other
-            // three checks (stall/encoder/tracking) have their own threshold
-            // conditions that naturally stay inactive when pwm=0/setpoint=0,
-            // so running them unconditionally here is harmless.
-            Diagnostics_Update(target_rpm, rpm, pwm);
+            // This matters specifically for Driver_Overcurrent() (DRV8876 nFAULT pin):
+            // it's a hardware protection signal (overcurrent/overvoltage) that can
+            // assert regardless of whether we're actively commanding the motor, so it
+            // must not be gated behind motor_enabled.
+            //
+            // The stall and tracking checks only make sense while the motor is being
+            // driven, so they receive a setpoint of 0 when the motor is disabled
+            // (their thresholds require setpoint > STALL_SETPOINT_MIN). Passing the
+            // stale target_rpm here would compare it against a stopped motor and
+            // re-latch a tracking error right after the faults are cleared with 'R'.
+            float diag_setpoint = motor_enabled ? target_rpm : 0.0f;
+            Diagnostics_Update(diag_setpoint, rpm, pwm, motor_enabled);
 
             uint8_t faults = Diagnostics_GetFaults();
 
@@ -204,9 +209,11 @@ int main(void)
                 // Fail-safe: any active fault immediately stops the motor
                 // and disables control until explicitly cleared via the
                 // 'R' UART command (Diagnostics_ClearFaults()).
-                Motor_Stop();
-                motor_enabled = false;
-                printf("Faults = 0x%02X\r\n", faults);
+            	 Motor_Stop();
+            	 motor_enabled = false;
+            	 target_rpm = 0.0f;   // drop the stale setpoint
+            	 PI_Reset();          // clear the integrator so a restart doesn't jump
+            	 printf("Faults = 0x%02X\r\n", faults);
             }
         }
 

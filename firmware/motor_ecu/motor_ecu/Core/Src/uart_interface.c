@@ -122,6 +122,12 @@ void Process_Command(const char *command)
 
             break;
 
+        case 'H':
+
+                    // Heartbeat: no action, only keeps the communication
+                    // watchdog alive (see Diagnostics_CommAlive() in main loop).
+
+                    break;
         default:
 
             printf("Unknown command\r\n");

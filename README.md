@@ -1,3 +1,8 @@
+## Demo
+
+![Motor control demo](docs/demo.gif)
+[![Full presentation on YouTube]((https://youtu.be/IHiPVReutKA)
+
 # stm32-distributed-motor-control
 Distributed embedded motor control system: STM32L476 Motor ECU in a
 closed feedback loop with a Raspberry Pi supervisor over UART. The Pi
